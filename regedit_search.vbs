@@ -228,7 +228,7 @@ WScript.Quit 0
 '    WScript.Echo hive ( FIELD_NAME ) & "\" & strKeyPath & " : "  & value & _
 '     " [" & val_type & "]" & " = " & data
 
-'[1']
+' [1']
 ' 28/03/2021
 ' 21:25
 ' Ruche: HKEY_CLASSES_ROOT (&80000000)
