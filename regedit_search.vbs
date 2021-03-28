@@ -207,5 +207,66 @@ Next
 Set oReg = Nothing
 Set hives = Nothing
 
-WScript.Quit 0 
+WScript.Quit 0
+
+' [1] voir aussi [1']
+' Testé SANS succès sur Windows XP Pro (Mémoire insuffisante - voir [1])
+' 4GB de vRAM mais Windows ne voit que 3GB => limitation technique
+'  (https://answers.microsoft.com/en-us/windows/forum/windows_xp-windows_install/xp-32-see-only-3gb-ram-bios-and-pc-wizzard-see/bf65bbf4-5703-40b7-8d1f-cdea75702a22)
+'  Ceci étant, la mémoire n'avait pas l'air d'être sollicité plus que ça ; j'opte plutôt pour un problème de gestion de mémoire avec VBScript
+' C:\Documents and Settings\root>cscript /nologo Bureau\regedit_search.vbs "BOCHS"
+' # HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System : SystemBiosVersion [REG_MULTI_SZ] = BOCHS  - 1
+' { C:\Documents and Settings\user\Bureau\regedit_search.vbs(133, 2) Erreur d'exécution Microsoft VBScript: Mémoire insuffisante: 'oReg.EnumValues'
+' test 1
+' contexte du script :
+' strKeyPath = ""
+' juste la ruche HKLM : ReDim Preserve hives ( UBound ( hives ) + 1 ) : hives ( UBound ( hives ) ) = Array ( "HKEY_LOCAL_MACHINE",	&H80000002 )
+' test 2 : reboot + même test => mêmes symptômes
+' test 3 : j'ai activé l'affichage des valeurs trouvées => message équivalent
+' C:\Documents and Settings\user\Bureau\regedit_search.vbs(201, 5) (null): Espace insuffisant pour traiter cette commande.
+' ligne 201 j'ai la commande d'affichage des valeurs trouvée :
+'    WScript.Echo hive ( FIELD_NAME ) & "\" & strKeyPath & " : "  & value & _
+'     " [" & val_type & "]" & " = " & data
+
+'[1']
+' 28/03/2021
+' 21:25
+' Ruche: HKEY_CLASSES_ROOT (&80000000)
+' # HKEY_CLASSES_ROOT\CLSID\{1171A62F-05D2-11D1-83FC-00A0C9089C5A}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' # HKEY_CLASSES_ROOT\CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' # HKEY_CLASSES_ROOT\CLSID\{D27CDB70-AE6D-11cf-96B8-444553540000}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' Ruche: HKEY_CURRENT_USER (&80000001)
+' Ruche: HKEY_LOCAL_MACHINE (&80000002)
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{1171A62F-05D2-11D1-83FC-00A0C9089C5A}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{D27CDB6E-AE6D-11cf-96B8-444553540000}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{D27CDB70-AE6D-11cf-96B8-444553540000}\InprocServer32 : (Par defaut) [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\Flash6.ocx
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Macromedia\FlashPlayerPlugin : PlayerPath [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\NPSWF32.dll
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Macromedia\FlashPlayerPlugin : UninstallerPath [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\FlashUtil10m_Plugin.exe
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Adobe Flash Player Plugin : UninstallString [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\FlashUtil10m_Plugin.exe -maintain plugin
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Adobe Flash Player Plugin : DisplayIcon [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\FlashUtil10m_Plugin.exe
+' # HKEY_LOCAL_MACHINE\SOFTWARE\MozillaPlugins\@adobe.com/FlashPlayer : Path [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\NPSWF32.dll
+' # HKEY_LOCAL_MACHINE\SOFTWARE\MozillaPlugins\@adobe.com/FlashPlayer : XPTPath [REG_SZ] = C:\WINDOWS\system32\Macromed\Flash\flashplayer.xpt
+' C:\Documents and Settings\user\Bureau\regedit_search.vbs(128, 2) Erreur d'exécution Microsoft VBScript: Mémoire insuffisante: 'oReg.EnumValues'
+' 28/03/2021
+' 21:30
+
+' [2]
+' Testé AVEC succès sur Windows 7 Pro 8GB de vRAM en 10 minutes (voir [2])
+' C:\Users\user>cls && date /t & time /t & cscript /nologo Desktop\regedit_search.vbs "\Macromed\Flash" & date /t & time /t
+' 28/03/2021
+' 20:44
+' Ruche: HKEY_CLASSES_ROOT (&80000000)
+' Ruche: HKEY_CURRENT_USER (&80000001)
+' Ruche: HKEY_LOCAL_MACHINE (&80000002)
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Macromedia\FlashPlayerPlugin : PlayerPath [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\NPSWF32.dll
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Macromedia\FlashPlayerPlugin : UninstallerPath [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\FlashUtil10m_Plugin.exe
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Adobe Flash Player Plugin : UninstallString [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\FlashUtil10m_Plugin.exe -maintain plugin
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Adobe Flash Player Plugin : DisplayIcon [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\FlashUtil10m_Plugin.exe
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\MozillaPlugins\@adobe.com/FlashPlayer : Path [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\NPSWF32.dll
+' # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\MozillaPlugins\@adobe.com/FlashPlayer : XPTPath [REG_SZ] = C:\Windows\SysWOW64\Macromed\Flash\flashplayer.xpt
+' Ruche: HKEY_USERS (&80000003)
+' Ruche: HKEY_CURRENT_CONFIG (&80000005)
+' Ruche: HKEY_DYN_DATA (&80000006)
+' 28/03/2021
+' 20:54
 ```
